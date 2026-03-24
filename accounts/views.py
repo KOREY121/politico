@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Voter
-from .serializers import VoterRegisterSerializer,VoterLoginSerializer,VoterProfileSerializer,VoterAdminSerializer,ChangePasswordSerializer
+from .serializers import AdminRegisterSerializer, VoterRegisterSerializer,VoterLoginSerializer,VoterProfileSerializer,VoterAdminSerializer,ChangePasswordSerializer
 
 def get_tokens_for_voter(voter):
     refresh = RefreshToken.for_user(voter)
@@ -14,6 +14,26 @@ def get_tokens_for_voter(voter):
         'access': str(refresh.access_token)
     }
 
+
+class AdminRegisterView(APIView):
+    """
+    POST /api/auth/admin/register/
+    Requires an existing admin token to create new admins.
+    Only admins can create other admins.
+    """
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        serializer = AdminRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            admin    = serializer.save()
+            tokens   = get_tokens_for_voter(admin)
+            return Response({
+                'message': 'Admin registered successfully.',
+                'admin':   VoterProfileSerializer(admin).data,
+                'tokens':  tokens,
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VoterRegisterView(APIView):
     permission_classes = [AllowAny]

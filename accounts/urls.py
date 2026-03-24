@@ -8,4 +8,5 @@ urlpatterns = [
     path('logout/',         views.VoterLogoutView.as_view(),    name='voter-logout'),
     path('token/refresh/',  TokenRefreshView.as_view(),         name='token-refresh'),
     path('profile/',        views.VoterProfileView.as_view(),   name='voter-profile'),
+    path('admin/register/',     views.AdminRegisterView.as_view(),    name='admin-register'),
 ]
