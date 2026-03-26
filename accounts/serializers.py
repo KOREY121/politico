@@ -89,23 +89,32 @@ class VoterRegisterSerializer(serializers.ModelSerializer):
 
 class VoterLoginSerializer(serializers.Serializer):
     national_id = serializers.CharField()
-    password = serializers.CharField(write_only = True)
+    password = serializers.CharField(write_only=True)
 
-    def validate(self,data):
+    def validate(self, data):
         national_id = data.get('national_id')
         password = data.get('password')
 
+        # Try national_id first, then email
+        from django.contrib.auth import authenticate
         voter = authenticate(username=national_id, password=password)
 
         if not voter:
-            raise serializers.ValidationError('Invalid NIN or password')
-    
-        if voter.status !='active':
-            raise serializers.ValidationError('Your account is inactive. Contact the admin.')
-    
-        data['voter'] = voter 
-        return data 
-    
+            # Try finding by email
+            from .models import Voter
+            try:
+                voter_obj = Voter.objects.get(email=national_id)
+                voter = authenticate(username=voter_obj.national_id, password=password)
+            except Voter.DoesNotExist:
+                pass
+
+        if not voter:
+            raise serializers.ValidationError('Invalid credentials.')
+        if voter.status != 'active':
+            raise serializers.ValidationError('Your account is inactive.')
+
+        data['voter'] = voter
+        return data    
 
 class VoterProfileSerializer(serializers.ModelSerializer):
 
