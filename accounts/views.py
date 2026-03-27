@@ -16,23 +16,24 @@ def get_tokens_for_voter(voter):
 
 
 class AdminRegisterView(APIView):
-
-    #Requires an existing admin token to create new admins. Only admins can create other admins.
-
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = AdminRegisterSerializer(data=request.data)
         if serializer.is_valid():
-            admin    = serializer.save()
-            tokens   = get_tokens_for_voter(admin)
+            voter = serializer.save()
+            
+            # Re-fetch to ensure all fields are fresh
+            from .models import Voter as VoterModel
+            fresh_voter = VoterModel.objects.get(pk=voter.pk)
+            
+            tokens = get_tokens_for_voter(fresh_voter)
             return Response({
                 'message': 'Admin registered successfully.',
-                'admin':   VoterProfileSerializer(admin).data,
+                'voter':   VoterProfileSerializer(fresh_voter).data,
                 'tokens':  tokens,
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class VoterRegisterView(APIView):
     permission_classes = [AllowAny]
 

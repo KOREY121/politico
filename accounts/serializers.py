@@ -46,7 +46,8 @@ class AdminRegisterSerializer(serializers.ModelSerializer):
         )
         # Automatically set admin flags
         voter.is_staff     = True
-        voter.is_superuser = False  #just staff
+        voter.is_superuser = False 
+        voter.status = 'active'
         voter.save()
         return voter
 
