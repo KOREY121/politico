@@ -52,18 +52,22 @@ class VoterRegisterView(APIView):
 class VoterLoginView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self,request):
+    def post(self, request):
         serializer = VoterLoginSerializer(data=request.data)
         if serializer.is_valid():
-            voter = serializer.validated_data['voter']
+            voter  = serializer.validated_data['voter']
             tokens = get_tokens_for_voter(voter)
+
+            # Re-fetch voter from DB to ensure all fields are present
+            from .models import Voter
+            fresh_voter = Voter.objects.get(pk=voter.pk)
+
             return Response({
-                'message':'Login Successful',
-                'voter': VoterLoginSerializer(voter).data,
-                'tokens': tokens,
+                'message': 'Login successful.',
+                'voter':   VoterProfileSerializer(fresh_voter).data,
+                'tokens':  tokens,
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 class VoterLogoutView(APIView):
     permission_classes = [IsAuthenticated]
