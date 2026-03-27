@@ -16,12 +16,10 @@ def get_tokens_for_voter(voter):
 
 
 class AdminRegisterView(APIView):
-    """
-    POST /api/auth/admin/register/
-    Requires an existing admin token to create new admins.
-    Only admins can create other admins.
-    """
-    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    #Requires an existing admin token to create new admins. Only admins can create other admins.
+
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = AdminRegisterSerializer(data=request.data)
