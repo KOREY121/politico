@@ -120,8 +120,8 @@ class VoterProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Voter
-        fields = ['voter_id', 'national_id', 'full_name', 'email','dob', 'status', 'date_joined' ]
-        read_only_fields = ['voter_id', 'national_id', 'status','date_joined']
+        fields = ['voter_id', 'national_id', 'full_name', 'email','dob', 'status','is_staff', 'date_joined' ]
+        read_only_fields = ['voter_id', 'national_id', 'status', 'is_staff','date_joined']
 
 
 class VoterAdminSerializer(serializers.ModelSerializer):
