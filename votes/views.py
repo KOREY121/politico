@@ -63,7 +63,7 @@ class CastVoteView(APIView):
 
         except Exception as e:
             return Response(
-                {'error': 'An error occurred while casting your vote. Please try again.'},
+                {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
