@@ -8,7 +8,7 @@ class Vote(models.Model):
                 on_delete= models.CASCADE, related_name='votes')
     election = models.ForeignKey('elections.Election',
                 on_delete=models.CASCADE, related_name='votes')
-    time = models.TimeField()
+    time = models.DateTimeField(auto_now_add=True)
 
 
     class Meta:
