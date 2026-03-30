@@ -45,7 +45,7 @@ class ElectionDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_permisions(self):
         if self.request.method == 'GET':
-            return [ AllowAny]
+            return [ AllowAny()]
         return [IsAuthenticated(), IsAdminUser()]
     
     def update(self, request, *args, **kwargs):
